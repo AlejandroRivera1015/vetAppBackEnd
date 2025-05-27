@@ -26,7 +26,11 @@ public class AppSecurityConfig  {
         return http
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("appointments/**").hasAnyAuthority("admin", "doctor", "receptionist")
+                        .requestMatchers("/appointments/get").hasAnyAuthority("admin", "doctor", "receptionist", "client")
+                        .requestMatchers("/appointments/create").hasAnyAuthority("admin", "doctor")
+                        .requestMatchers("/appointments/update").hasAnyAuthority("admin", "doctor")
+                        .requestMatchers("/appointments/delete").hasAnyAuthority("admin", "doctor","client")
+                        .anyRequest().denyAll()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/**").disable())
