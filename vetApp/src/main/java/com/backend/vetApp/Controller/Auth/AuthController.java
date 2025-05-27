@@ -1,6 +1,7 @@
 package com.backend.vetApp.Controller.Auth;
 
 import com.backend.vetApp.DTO.UserDTO.UserDTO;
+import com.backend.vetApp.Exception.User.UserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,12 +30,11 @@ public class AuthController {
                 }
 
                 default -> {
-                    return  new ResponseEntity<>("error", HttpStatus.NOT_FOUND);
+                   throw new UserException("Invalid role", userDTO.getEmail());
                 }
             }
         }catch (Exception e){
-            return  null;
-        }
+            return  new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);        }
     }
 }
 
