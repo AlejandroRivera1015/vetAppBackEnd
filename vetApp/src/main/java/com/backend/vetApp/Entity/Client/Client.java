@@ -13,7 +13,8 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-
+@AllArgsConstructor
+@NoArgsConstructor
 public class Client extends User {
 
     @OneToMany(mappedBy = "owner")
@@ -28,7 +29,9 @@ public class Client extends User {
     public  Client(String name, String email, Long phoneNumber, String password, String role) {
         super(name, email, phoneNumber, password, role);
     }
-
+    public  Client(String email, String password, String role) {
+        super(email, password, role);
+    }
 
 
 
