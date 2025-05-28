@@ -3,6 +3,7 @@ package com.backend.vetApp.Controller.Auth;
 import com.backend.vetApp.DTO.User.UserDTO;
 import com.backend.vetApp.Exception.User.UserException;
 import com.backend.vetApp.Service.User.UserServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,9 @@ public class AuthController {
     UserServiceImpl userService;
 
     @RequestMapping("/login")
-    public ResponseEntity<?> logIn(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> logIn(@RequestBody UserDTO userDTO, HttpServletResponse httpResponse) {
         try{
-            Boolean response = userService.logIn(userDTO);
+            Boolean response = userService.logIn(userDTO, httpResponse);
             if (response) {
                 return new ResponseEntity<>(true, HttpStatus.OK);
             }
