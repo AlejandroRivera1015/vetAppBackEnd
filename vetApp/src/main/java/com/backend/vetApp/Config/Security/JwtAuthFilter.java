@@ -41,12 +41,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                Cookie[] cookieList = request.getCookies();
                if(cookieList.length > 0){
                    for(Cookie cookie : cookieList){
-                       if(cookie.getName().equals("jwt-auth-cookie")){
+                       if(cookie.getName().equals("jwtAuthCookie")){
                            String jwtToken = cookie.getValue();
                            Jws<Claims> claimsJws = jwtUtil.validateToken(jwtToken);
                            Authentication auth = getAuthentication(claimsJws.getBody());
                            SecurityContextHolder.getContext().setAuthentication(auth);
-                           return;
                        }
                    }
                }
