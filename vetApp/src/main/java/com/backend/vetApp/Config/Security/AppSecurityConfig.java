@@ -26,6 +26,7 @@ public class AppSecurityConfig  {
         return http
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/user/create").hasAnyAuthority("admin", "receptionist")
                         .requestMatchers("/appointments/get").hasAnyAuthority("admin", "doctor", "receptionist", "client")
                         .requestMatchers("/appointments/create").hasAnyAuthority("admin", "doctor")
                         .requestMatchers("/appointments/update").hasAnyAuthority("admin", "doctor")

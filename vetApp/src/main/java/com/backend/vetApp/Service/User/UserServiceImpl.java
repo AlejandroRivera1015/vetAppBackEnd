@@ -1,9 +1,11 @@
 package com.backend.vetApp.Service.User;
 
-import com.backend.vetApp.Entity.User.User;
-import com.backend.vetApp.Exception.User.UserException;
-import com.backend.vetApp.Repository.User.UserRepository;
+import com.backend.vetApp.DTO.User.UserDTO;
+import com.backend.vetApp.Entity.Client.Client;
+import com.backend.vetApp.Repository.Client.ClientRepository;
+import com.backend.vetApp.Repository.Doctor.DoctorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import  com.backend.vetApp.Config.Utils.EncryptDataUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,19 +14,41 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    UserRepository userRepository;
+    ClientRepository clientRepository;
+    @Autowired
+    DoctorRepository doctorRepository;
+
     @Override
-    public  Boolean createUser(User user) {
-        try {
-            User createdUser = userRepository.save(user);
-            if(createdUser.equals(user)){
-                return  true;
+    public  Boolean createUser(UserDTO userDTO) {
+
+        try{
+            String encryptedPassword = EncryptDataUtil.toEncrypt(userDTO.getPassword());
+            userDTO.setPassword(encryptedPassword);
+
+            switch (userDTO.getRole()){
+                case  "client" : {
+                    Client newClient = new Client(userDTO.getEmail(),userDTO.getPassword(),userDTO.getRole());
+                    Client client = clientRepository.save(newClient);
+                    return  true;
+                }
+                case "doctor" : {
+
+                }
+                case "receptionist" : {
+
+                }
+                default:{
+
+                }
+
             }
-            else {
-                throw new UserException("cantCreateUser", 0L);
-            }
-        } catch(UserException e) {
-            return false;
+
+        }catch (Exception e){
+            return  false;
+
         }
+
+        return  false;
+
     }
 }
