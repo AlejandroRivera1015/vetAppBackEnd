@@ -1,7 +1,10 @@
 package com.backend.vetApp.Controller.Auth;
 
-import com.backend.vetApp.DTO.UserDTO.UserDTO;
+import com.backend.vetApp.DTO.User.UserDTO;
 import com.backend.vetApp.Exception.User.UserException;
+import com.backend.vetApp.Service.User.UserServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,29 +15,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
 
+    @Autowired
+    UserServiceImpl userService;
+
     @RequestMapping("/login")
-    public ResponseEntity<?> logIn(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> logIn(@RequestBody UserDTO userDTO, HttpServletResponse httpResponse) {
         try{
-             switch (userDTO.getRole()) {
-                case "admin" ->{
-                    return  new ResponseEntity<>("admin", HttpStatus.OK);
-
-                }
-                case "doctor" ->{
-                    return  new ResponseEntity<>("doctor", HttpStatus.OK);
-
-                }
-
-                case "client" ->{
-                    return  new ResponseEntity<>("client", HttpStatus.OK);
-                }
-
-                default -> {
-                   throw new UserException("Invalid role", userDTO.getEmail());
-                }
+            Boolean response = userService.logIn(userDTO, httpResponse);
+            if (response) {
+                return new ResponseEntity<>(true, HttpStatus.OK);
             }
+            else {
+                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+            }
+
         }catch (Exception e){
-            return  new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);        }
+            return  new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
 
