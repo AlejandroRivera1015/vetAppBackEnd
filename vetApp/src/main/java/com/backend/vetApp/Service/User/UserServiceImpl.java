@@ -1,5 +1,6 @@
 package com.backend.vetApp.Service.User;
 
+import com.backend.vetApp.Config.Utils.CookieUtil;
 import com.backend.vetApp.DTO.User.UserDTO;
 import com.backend.vetApp.Entity.Admin.Admin;
 import com.backend.vetApp.Entity.Client.Client;
@@ -8,10 +9,15 @@ import com.backend.vetApp.Exception.User.UserException;
 import com.backend.vetApp.Repository.Admin.AdminRepository;
 import com.backend.vetApp.Repository.Client.ClientRepository;
 import com.backend.vetApp.Repository.Doctor.DoctorRepository;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import  com.backend.vetApp.Config.Utils.EncryptDataUtil;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -23,6 +29,8 @@ public class UserServiceImpl implements UserService {
     DoctorRepository doctorRepository;
     @Autowired
     AdminRepository adminRepository;
+    @Autowired
+    CookieUtil cookieUtil;
 
     @Override
     public  Boolean createUser(UserDTO userDTO) {
@@ -30,6 +38,7 @@ public class UserServiceImpl implements UserService {
         try{
             String encryptedPassword = EncryptDataUtil.toEncrypt(userDTO.getPassword());
             userDTO.setPassword(encryptedPassword);
+            System.out.println("User Role: " + userDTO.getRole());
 
             switch (userDTO.getRole()){
                 case  "client" : {
@@ -38,65 +47,73 @@ public class UserServiceImpl implements UserService {
                     return  true;
                 }
                 case "doctor" : {
+                    Dr newDoctor = new Dr(userDTO.getEmail(), userDTO.getPassword(), userDTO.getRole());
+                    Dr doctor = doctorRepository.save(newDoctor);
+                    return true;
 
                 }
                 case "receptionist" : {
+                    Admin newAdmin = new Admin(userDTO.getEmail(), userDTO.getPassword(), userDTO.getRole());
+                    Admin admin = adminRepository.save(newAdmin);
+                    return true;
 
                 }
                 default:{
-
+                    return  false  ;
                 }
 
             }
 
         }catch (Exception e){
             return  false;
-
         }
-
-        return  false;
-
     }
 
     @Override
-    public Boolean logIn(UserDTO  userDTO){
+    public Boolean logIn(UserDTO  userDTO, HttpServletResponse response){
         String encryptedPassword = EncryptDataUtil.toEncrypt(userDTO.getPassword());
-        System.out.println("Encrypted Password: " + encryptedPassword);
+        Map<String, String> userClaims = new HashMap<>();
+
         try{
             switch (userDTO.getRole()) {
                 case "admin", "receptionist" -> {
                     Optional<Admin> admin = adminRepository.findByEmail(userDTO.getEmail());
                     if(admin.isPresent()){
+                        userClaims.put("id", admin.get().getId().toString());
+                        userClaims.put("role", admin.get().getRole());
+                        cookieUtil.createAuthCookie(userClaims, response);
                         return EncryptDataUtil.toDecrypt(userDTO.getPassword(),admin.get().getPassword());
                     }
                     else  {
                         throw new UserException("UserNotFound", userDTO.getEmail());
                     }
-
                 }
 
                 case "doctor" ->{
                     Optional<Dr> doctor = doctorRepository.findByEmail(userDTO.getEmail());
-                    if ((doctor.isPresent())){
-                        return  EncryptDataUtil.toDecrypt(userDTO.getEmail(), doctor.get().getPassword());
+                    if(doctor.isPresent()){
+                        userClaims.put("id", doctor.get().getId().toString());
+                        userClaims.put("role", doctor.get().getRole());
+                        cookieUtil.createAuthCookie(userClaims, response);
+                        return EncryptDataUtil.toDecrypt(userDTO.getPassword(),doctor.get().getPassword());
                     }
-                    else {
+                    else  {
                         throw new UserException("UserNotFound", userDTO.getEmail());
                     }
-
                 }
 
                 case "client" ->{
                     Optional<Client> client = clientRepository.findByEmail(userDTO.getEmail());
                     if(client.isPresent()){
-                        return EncryptDataUtil.toDecrypt(userDTO.getPassword(), client.get().getPassword());
+                        userClaims.put("id", client.get().getId().toString());
+                        userClaims.put("role", client.get().getRole());
+                        cookieUtil.createAuthCookie(userClaims, response);
+                        return EncryptDataUtil.toDecrypt(userDTO.getPassword(),client.get().getPassword());
                     }
-                    else {
+                    else  {
                         throw new UserException("UserNotFound", userDTO.getEmail());
                     }
-
                 }
-
                 default -> {
                     throw new UserException("UserNotFound", userDTO.getEmail());
                 }
