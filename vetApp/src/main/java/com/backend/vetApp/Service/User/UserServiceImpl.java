@@ -5,6 +5,7 @@ import com.backend.vetApp.DTO.User.UserDTO;
 import com.backend.vetApp.Entity.Admin.Admin;
 import com.backend.vetApp.Entity.Client.Client;
 import com.backend.vetApp.Entity.HealtPersonal.Dr;
+import com.backend.vetApp.Entity.User.User;
 import com.backend.vetApp.Exception.User.UserException;
 import com.backend.vetApp.Repository.Admin.AdminRepository;
 import com.backend.vetApp.Repository.Client.ClientRepository;
@@ -45,6 +46,7 @@ public class UserServiceImpl implements UserService {
                     Client newClient = new Client(userDTO.getEmail(),userDTO.getPassword(),userDTO.getRole());
                     Client client = clientRepository.save(newClient);
                     return  true;
+
                 }
                 case "doctor" : {
                     Dr newDoctor = new Dr(userDTO.getEmail(), userDTO.getPassword(), userDTO.getRole());
@@ -70,9 +72,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean logIn(UserDTO  userDTO, HttpServletResponse response){
+    public UserDTO logIn(UserDTO  userDTO, HttpServletResponse response){
         String encryptedPassword = EncryptDataUtil.toEncrypt(userDTO.getPassword());
         Map<String, String> userClaims = new HashMap<>();
+        boolean isAuthenticated = false;
 
         try{
             switch (userDTO.getRole()) {
@@ -82,7 +85,10 @@ public class UserServiceImpl implements UserService {
                         userClaims.put("id", admin.get().getId().toString());
                         userClaims.put("role", admin.get().getRole());
                         cookieUtil.createAuthCookie(userClaims, response);
-                        return EncryptDataUtil.toDecrypt(userDTO.getPassword(),admin.get().getPassword());
+                        if(EncryptDataUtil.toDecrypt(userDTO.getPassword(),admin.get().getPassword())){
+                            isAuthenticated = true;
+                            return  new UserDTO(admin.get().getId(), admin.get().getRole());
+                        }
                     }
                     else  {
                         throw new UserException("UserNotFound", userDTO.getEmail());
@@ -95,7 +101,10 @@ public class UserServiceImpl implements UserService {
                         userClaims.put("id", doctor.get().getId().toString());
                         userClaims.put("role", doctor.get().getRole());
                         cookieUtil.createAuthCookie(userClaims, response);
-                        return EncryptDataUtil.toDecrypt(userDTO.getPassword(),doctor.get().getPassword());
+                        if(EncryptDataUtil.toDecrypt(userDTO.getPassword(),doctor.get().getPassword())){
+                            isAuthenticated = true;
+                            return  new UserDTO(doctor.get().getId(), doctor.get().getRole());
+                        }
                     }
                     else  {
                         throw new UserException("UserNotFound", userDTO.getEmail());
@@ -108,7 +117,10 @@ public class UserServiceImpl implements UserService {
                         userClaims.put("id", client.get().getId().toString());
                         userClaims.put("role", client.get().getRole());
                         cookieUtil.createAuthCookie(userClaims, response);
-                        return EncryptDataUtil.toDecrypt(userDTO.getPassword(),client.get().getPassword());
+                        if(EncryptDataUtil.toDecrypt(userDTO.getPassword(),client.get().getPassword())){
+                            isAuthenticated = true;
+                            return  new UserDTO(client.get().getId(), client.get().getRole());
+                            }
                     }
                     else  {
                         throw new UserException("UserNotFound", userDTO.getEmail());
@@ -119,7 +131,8 @@ public class UserServiceImpl implements UserService {
                 }
             }
         }catch (UserException e){
-            return  false;
+            return  new UserDTO(0L, "UserNotFound");
         }
+        return  new UserDTO(0L, "UserNotFound");
     }
 }
