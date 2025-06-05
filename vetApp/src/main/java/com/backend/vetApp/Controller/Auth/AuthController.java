@@ -1,6 +1,7 @@
 package com.backend.vetApp.Controller.Auth;
 
 import com.backend.vetApp.DTO.User.UserDTO;
+import com.backend.vetApp.Entity.User.User;
 import com.backend.vetApp.Exception.User.UserException;
 import com.backend.vetApp.Service.User.UserServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,16 +22,16 @@ public class AuthController {
     @RequestMapping("/login")
     public ResponseEntity<?> logIn(@RequestBody UserDTO userDTO, HttpServletResponse httpResponse) {
         try{
-            Boolean response = userService.logIn(userDTO, httpResponse);
-            if (response) {
-                return new ResponseEntity<>(true, HttpStatus.OK);
+            UserDTO userResponse = userService.logIn(userDTO, httpResponse);
+            if (!userResponse.getRole().equals("UserNotFound")) {
+                return new ResponseEntity<>(userResponse, HttpStatus.OK);
             }
             else {
-                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>( userResponse, HttpStatus.NOT_FOUND);
             }
 
         }catch (Exception e){
-            return  new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return  new ResponseEntity<>(new UserDTO(0L,"serverError"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
