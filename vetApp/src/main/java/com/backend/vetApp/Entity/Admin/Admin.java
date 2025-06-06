@@ -8,8 +8,14 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
 public class Admin extends User {
     public Admin(String email, String name, Long phoneNumber, String password, String role) {
         super(name, email, phoneNumber, password, role);
+    }
+
+    public  Admin(String email, String password, String role) {
+        super(email, password, role);
+
     }
 }

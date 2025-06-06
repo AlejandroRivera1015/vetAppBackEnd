@@ -9,5 +9,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserService {
     Boolean createUser(UserDTO user);
-    Boolean logIn(UserDTO user, HttpServletResponse response);
+    UserDTO logIn(UserDTO user, HttpServletResponse response);
 }
