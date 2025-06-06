@@ -35,4 +35,8 @@ public class Dr extends User {
         super(name, email, phoneNumber, password, role);
         this.specialty = specialty;
     }
+
+    public Dr(String email, String password, String role) {
+        super(email, password, role);
+    }
 }

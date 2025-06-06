@@ -2,11 +2,13 @@ package com.backend.vetApp.Entity.User;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @MappedSuperclass
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class User {
 
     @Id
