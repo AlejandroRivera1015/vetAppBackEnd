@@ -31,6 +31,7 @@ public class AppSecurityConfig  {
                         .requestMatchers("/appointments/create").hasAnyAuthority("admin", "doctor")
                         .requestMatchers("/appointments/update").hasAnyAuthority("admin", "doctor")
                         .requestMatchers("/appointments/delete").hasAnyAuthority("admin", "doctor","client")
+                        .requestMatchers("/doctor/**").hasAnyAuthority("admin","doctor","client","receptionist")
                         .anyRequest().denyAll()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
