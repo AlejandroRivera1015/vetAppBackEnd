@@ -17,6 +17,7 @@ import  com.backend.vetApp.Config.Utils.EncryptDataUtil;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -86,6 +87,12 @@ public class UserServiceImpl implements UserService {
                         userClaims.put("role", admin.get().getRole());
                         cookieUtil.createAuthCookie(userClaims, response);
                         if(EncryptDataUtil.toDecrypt(userDTO.getPassword(),admin.get().getPassword())){
+
+                            if(userDTO.getRole().equals("receptionist")){
+                                Admin receptionist = admin.get();
+                                receptionist.setStartShitAt(LocalDateTime.now());
+                                adminRepository.save(receptionist);
+                            }
                             isAuthenticated = true;
                             return  new UserDTO(admin.get().getId(), admin.get().getRole());
                         }
@@ -97,11 +104,15 @@ public class UserServiceImpl implements UserService {
 
                 case "doctor" ->{
                     Optional<Dr> doctor = doctorRepository.findByEmail(userDTO.getEmail());
+
                     if(doctor.isPresent()){
                         userClaims.put("id", doctor.get().getId().toString());
                         userClaims.put("role", doctor.get().getRole());
                         cookieUtil.createAuthCookie(userClaims, response);
                         if(EncryptDataUtil.toDecrypt(userDTO.getPassword(),doctor.get().getPassword())){
+                             Dr doc = doctor.get();
+                             doc.setStarShiftAt(LocalDateTime.now());
+                             doctorRepository.save(doc);
                             isAuthenticated = true;
                             return  new UserDTO(doctor.get().getId(), doctor.get().getRole());
                         }
