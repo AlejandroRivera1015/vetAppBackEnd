@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -21,6 +22,7 @@ public class Dr extends User {
 
     private String specialty;
     private Boolean isAvailable;
+    private LocalDateTime starShiftAt;
 
     @OneToMany( mappedBy = "doctor")
     @JsonManagedReference
@@ -30,13 +32,12 @@ public class Dr extends User {
     @JsonManagedReference
     private  List<MedicalAppointment> medicalAppointments;
 
-
     public Dr(String name, String email, Long phoneNumber, String password, String role, String specialty) {
         super(name, email, phoneNumber, password, role);
         this.specialty = specialty;
     }
 
-    public Dr(String email, String password, String role) {
+        public Dr(String email, String password, String role) {
         super(email, password, role);
     }
 }
