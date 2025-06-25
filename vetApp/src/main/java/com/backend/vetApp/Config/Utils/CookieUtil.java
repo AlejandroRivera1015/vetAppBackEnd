@@ -19,6 +19,7 @@ public class CookieUtil {
             Cookie authCookie = new Cookie("jwtAuthCookie", AuthCookieToken);
             System.out.println("Auth Cookie Token: " + AuthCookieToken);
             authCookie.setMaxAge(36000); // 10 hours
+            authCookie.setPath("/");
             authCookie.setAttribute("SameSite", "Lax");
             authCookie.setHttpOnly(true);
             response.addCookie(authCookie);

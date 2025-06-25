@@ -34,7 +34,7 @@ public class MedicalAppointment {
 
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name = "patient_id", nullable = false)
+    @JoinColumn(name = "patient_id", nullable = true)
     private Pet patient;
 
     @ManyToOne
@@ -43,13 +43,25 @@ public class MedicalAppointment {
     @JsonIgnoreProperties({ "password", "role"})
     private Client client;
 
+    @Column(nullable = true)
     @ElementCollection
     private List<MedicalSupplyDTO> medicalSupplies;
 
-
+    @Column(nullable = true)
     private LocalDateTime date;
+    @Column(nullable = true)
     private String status;
+    @Column(nullable = true)
     private String description;
+    @Column(nullable = true)
     private BigDecimal price;
+
+    public MedicalAppointment(Client client,  Dr doctor, LocalDateTime appointment){
+        this.client = client;
+        this.doctor = doctor;
+        this.date = appointment;
+    }
+
+
 
 }
