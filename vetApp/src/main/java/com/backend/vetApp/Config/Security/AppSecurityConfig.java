@@ -28,9 +28,10 @@ public class AppSecurityConfig  {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/user/create").hasAnyAuthority("admin", "receptionist")
                         .requestMatchers("/appointments/get").hasAnyAuthority("admin", "doctor", "receptionist", "client")
-                        .requestMatchers("/appointments/create").hasAnyAuthority("admin", "doctor")
+                        .requestMatchers("/appointments/create").hasAnyAuthority("admin", "doctor","client")
                         .requestMatchers("/appointments/update").hasAnyAuthority("admin", "doctor")
                         .requestMatchers("/appointments/delete").hasAnyAuthority("admin", "doctor","client")
+                        .requestMatchers("/doctor/**").hasAnyAuthority("admin","doctor","client","receptionist")
                         .anyRequest().denyAll()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -45,7 +46,7 @@ public class AppSecurityConfig  {
             corsConfiguration.setAllowCredentials(true);
             corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
             corsConfiguration.setAllowedHeaders(List.of("*"));
-            corsConfiguration.setAllowedOriginPatterns(List.of("http://localhost:4200","*"));
+            corsConfiguration.setAllowedOriginPatterns(List.of("http://localhost:4200"));
             UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
             source.registerCorsConfiguration("/**", corsConfiguration);
             return  source;
