@@ -22,6 +22,7 @@ public class DoctorServiceImpl implements DoctorService{
 
        return  availableDoctorsResponse = availableDoctors.stream().map(dr -> {
             return new DoctorDTO(
+                    dr.getId(),
                     dr.getName(),
                     dr.getSpecialty(),
                     dr.getMedicalAppointments().stream().map(medicalAppointment -> medicalAppointment.getDate()) .toList(),
