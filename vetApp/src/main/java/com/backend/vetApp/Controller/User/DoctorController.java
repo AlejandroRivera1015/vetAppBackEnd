@@ -18,6 +18,13 @@ public class DoctorController {
 
     @GetMapping("/getAllAvailable")
     public List<DoctorDTO> getAll(){
-        return doctorService.getAvailableDoctors();
+        try {
+            return doctorService.getAvailableDoctors();
+        }
+
+        catch (Exception e){
+            return  List.of(new DoctorDTO());
+        }
+
     }
 }
